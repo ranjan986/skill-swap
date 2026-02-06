@@ -27,7 +27,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://skill-swap-app.onrender.com",
     credentials: true,
   })
 );
