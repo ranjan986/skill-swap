@@ -1,7 +1,8 @@
 {
     "name": "internship-project",
     "version": "1.0.0",
-    "description": "Root package for deployment",
+    "private": true,
+    "description": "Full Stack Internship Project (Backend + Skill-Swap Frontend)",
     "main": "backend/server.js",
     "scripts": {
         "install-backend": "npm install --prefix backend",
@@ -10,13 +11,18 @@
         "build-frontend": "npm run build --prefix skill-swap",
         "build": "npm run install-all && npm run build-frontend",
         "start": "node backend/server.js",
-        "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix skill-swap\""
+        "dev": "concurrently -k \"npm run dev --prefix backend\" \"npm start --prefix skill-swap\""
     },
-    "keywords": [],
+    "keywords": [
+        "mern",
+        "internship",
+        "render",
+        "fullstack"
+    ],
     "author": "",
     "license": "ISC",
     "engines": {
-        "node": ">=16.0.0"
+        "node": ">=18"
     },
     "devDependencies": {
         "concurrently": "^9.2.1"

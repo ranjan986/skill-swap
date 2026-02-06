@@ -4,8 +4,6 @@ dotenv.config(); // ✅ ALWAYS FIRST
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 import express from "express";
 import cors from "cors";
@@ -22,6 +20,8 @@ import requestRoutes from "./routes/requestRoutes.js";
 connectDB();
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(express.json());
@@ -32,20 +32,19 @@ app.use(
   })
 );
 
+{/* Serve frontend */ }
+app.use(express.static(path.join(__dirname, "../skill-swap/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../skill-swap/build/index.html"));
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/requests", requestRoutes);
 
-// Serve static files in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../skill-swap/dist")));
-
-  app.get("/(.*)", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../skill-swap", "dist", "index.html"));
-  });
-}
 
 const PORT = process.env.PORT || 5000;
 
