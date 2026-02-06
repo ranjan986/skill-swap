@@ -4,8 +4,7 @@ import { IoArrowBack, IoArrowForward } from "react-icons/io5";
 import { FiSearch, FiFilter } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
-const API_URL = "http://localhost:5000/api/skills";
+import axios from "../api/axios";
 
 const categories = [
   "All",
@@ -32,9 +31,7 @@ export default function Skills() {
     const fetchSkills = async () => {
       try {
         setLoading(true);
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        if (!res.ok) throw new Error();
+        const { data } = await axios.get("/api/skills");
         setSkills(data);
       } catch (err) {
         setError("Failed to load skills. Please try again.");

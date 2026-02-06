@@ -3,6 +3,7 @@ import { FiClock, FiSend, FiCheck } from "react-icons/fi";
 import { AiOutlineCalendar } from "react-icons/ai";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
+import axios from "../api/axios";
 
 /* ---------- FORMAT HELPERS ---------- */
 
@@ -38,8 +39,6 @@ function formatTime(value) {
 
 /* ---------- COMPONENT ---------- */
 
-const REQUEST_API = "http://localhost:5000/api/requests";
-
 export default function SkillCard({ skill }) {
   const { user } = useAuth();
   const { title, price, time, image, date, category, user: owner } = skill;
@@ -56,18 +55,10 @@ export default function SkillCard({ skill }) {
       setRequestStatus("loading");
       const token = localStorage.getItem("token");
 
-      const res = await fetch(REQUEST_API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ skillId: skill._id, message: "Hi, I'd like to swap skills!" }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message);
+      await axios.post("/api/requests",
+        { skillId: skill._id, message: "Hi, I'd like to swap skills!" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       setRequestStatus("success");
     } catch (err) {

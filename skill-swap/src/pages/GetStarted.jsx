@@ -6,9 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import { FcGoogle } from "react-icons/fc";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const GOOGLE_API_URL = "http://localhost:5000/api/auth/google";
+import axios from "../api/axios";
 
 export default function GetStarted() {
   const navigate = useNavigate();
@@ -33,24 +31,11 @@ export default function GetStarted() {
     setError("");
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
+      await axios.post("/api/auth/register", formData);
       alert("Registration Successful!");
       navigate("/sign-in");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -61,19 +46,11 @@ export default function GetStarted() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      const res = await fetch(GOOGLE_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: user.displayName,
-          email: user.email,
-          avatar: user.photoURL,
-        }),
+      const { data } = await axios.post("/api/auth/google", {
+        name: user.displayName,
+        email: user.email,
+        avatar: user.photoURL,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Google Signup failed");
 
       localStorage.setItem("token", data.token);
       login({
@@ -85,7 +62,7 @@ export default function GetStarted() {
       navigate("/dashboard");
     } catch (err) {
       console.error("Google Signup Error:", err);
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 

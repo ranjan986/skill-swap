@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import axios from "../api/axios";
 
 export default function AddSkillForm() {
   const [form, setForm] = useState({
@@ -38,15 +37,12 @@ export default function AddSkillForm() {
         formData.append("image", image);
       }
 
-      const res = await fetch(`${API_URL}/api/skills`, {
-        method: "POST",
+      await axios.post("/api/skills", formData, {
         headers: {
-          Authorization: `Bearer ${token}`, // ❌ no content-type here
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        body: formData,
       });
-
-      if (!res.ok) throw new Error();
 
       setMessage("✅ Skill added successfully");
 

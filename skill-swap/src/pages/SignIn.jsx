@@ -7,7 +7,6 @@ import { auth, googleProvider } from "../firebase";
 import { FcGoogle } from "react-icons/fc";
 
 const API_URL = "http://localhost:5000/api/auth/login";
-const GOOGLE_API_URL = "http://localhost:5000/api/auth/google";
 
 export default function SignIn() {
   const { login } = useAuth();
@@ -24,17 +23,7 @@ export default function SignIn() {
     setLoading(true);
 
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      const { data } = await axios.post("/api/auth/login", { email, password });
 
       // Save token
       localStorage.setItem("token", data.token);
@@ -50,7 +39,7 @@ export default function SignIn() {
       navigate("/");
 
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -61,19 +50,11 @@ export default function SignIn() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      const res = await fetch(GOOGLE_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: user.displayName,
-          email: user.email,
-          avatar: user.photoURL,
-        }),
+      const { data } = await axios.post("/api/auth/google", {
+        name: user.displayName,
+        email: user.email,
+        avatar: user.photoURL,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Google Login failed");
 
       localStorage.setItem("token", data.token);
       login({
@@ -85,7 +66,7 @@ export default function SignIn() {
       navigate("/dashboard");
     } catch (err) {
       console.error("Google Login Error:", err);
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 

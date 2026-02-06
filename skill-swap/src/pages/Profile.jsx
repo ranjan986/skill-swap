@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-
-const API_URL = "http://localhost:5000/api/auth/me";
+import axios from "../api/axios";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -13,19 +12,13 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-
-        const res = await fetch(API_URL, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const { data } = await axios.get("/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
 
         setUser(data);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.message || err.message);
       } finally {
         setLoading(false);
       }

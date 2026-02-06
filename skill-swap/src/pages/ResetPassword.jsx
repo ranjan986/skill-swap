@@ -1,8 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-const API_URL = "http://localhost:5000/api/auth/reset-password";
+import axios from "../api/axios";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -32,19 +31,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/${token}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Reset failed");
-      }
+      await axios.post(`/api/auth/reset-password/${token}`, { password });
 
       setSuccess("Password reset successful! Redirecting...");
       setPassword("");
@@ -54,7 +41,7 @@ export default function ResetPassword() {
       setTimeout(() => navigate("/sign-in"), 2000);
 
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-const API_URL = "http://localhost:5000/api/auth/forgot-password";
+import axios from "../api/axios";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -17,24 +16,11 @@ export default function ForgotPassword() {
     setMessage("");
 
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Something went wrong");
-      }
-
+      await axios.post("/api/auth/forgot-password", { email });
       setMessage("Reset link has been sent to your email 📩");
       setEmail("");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

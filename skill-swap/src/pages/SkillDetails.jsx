@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { IoArrowBack } from "react-icons/io5";
+import axios from "../api/axios";
 
 export default function SkillDetails() {
     const { id } = useParams();
@@ -15,11 +16,8 @@ export default function SkillDetails() {
         // or reusing the Skills list data if passed via state
         const fetchSkill = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/skills/${id}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setSkill(data);
-                }
+                const { data } = await axios.get(`/api/skills/${id}`);
+                setSkill(data);
             } catch (e) {
                 console.error(e);
             } finally {

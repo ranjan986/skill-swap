@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiSave, FiArrowLeft } from "react-icons/fi";
-
-const API_URL = "http://localhost:5000/api/skills";
+import axios from "../api/axios";
 
 export default function EditSkill() {
   const { id } = useParams();
@@ -22,9 +21,12 @@ export default function EditSkill() {
 
   useEffect(() => {
     const fetchSkill = async () => {
-      const res = await fetch(`${API_URL}/${id}`);
-      const data = await res.json();
-      setForm(data);
+      try {
+        const { data } = await axios.get(`/api/skills/${id}`);
+        setForm(data);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     fetchSkill();
@@ -39,18 +41,13 @@ export default function EditSkill() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
+      await axios.put(`/api/skills/${id}`, form, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
       });
-
-      if (res.ok) {
-        navigate("/skills");
-      }
+      navigate("/skills");
     } catch (err) {
       console.error(err);
     } finally {

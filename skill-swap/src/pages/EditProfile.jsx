@@ -3,8 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { FiCamera, FiTrash2, FiSave } from "react-icons/fi";
 import { motion } from "framer-motion";
-
-const API_URL = "http://localhost:5000/api/user";
+import axios from "../api/axios";
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -41,22 +40,20 @@ export default function EditProfile() {
     if (avatar) formData.append("avatar", avatar);
 
     try {
-      const res = await fetch(`${API_URL}/profile`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+      const { data } = await axios.put("/api/user/profile", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      const data = await res.json();
+      login({
+        fullName: data.user.name,
+        email: user.email,
+        avatar: data.user.avatar,
+      });
+      navigate("/profile"); // Navigate back to profile instead of home
 
-      if (res.ok) {
-        login({
-          fullName: data.user.name,
-          email: user.email,
-          avatar: data.user.avatar,
-        });
-        navigate("/profile"); // Navigate back to profile instead of home
-      }
     } catch (error) {
       console.error("Update failed", error);
     } finally {
@@ -71,20 +68,18 @@ export default function EditProfile() {
     if (!window.confirm("Remove profile picture?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/profile/avatar`, {
-        method: "DELETE",
+      await axios.delete("/api/user/profile/avatar", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.ok) {
-        login({
-          fullName: user.fullName,
-          email: user.email,
-          avatar: { url: "", public_id: "" },
-        });
-        setPreview("");
-        setAvatar(null);
-      }
+      login({
+        fullName: user.fullName,
+        email: user.email,
+        avatar: { url: "", public_id: "" },
+      });
+      setPreview("");
+      setAvatar(null);
+
     } catch (error) {
       console.error("Delete failed", error);
     }

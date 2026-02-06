@@ -5,9 +5,7 @@ import SkillEditor from "../components/SkillEditor";
 import AddSkillForm from "../components/AddSkillForm";
 import { motion } from "framer-motion";
 import { FiLogOut, FiEdit2, FiSearch, FiCheck, FiX } from "react-icons/fi";
-
-const ME_API = "http://localhost:5000/api/auth/me";
-const SKILL_API = "http://localhost:5000/api/user/skills";
+import axios from "../api/axios";
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -20,12 +18,9 @@ export default function Dashboard() {
     const fetchMe = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(ME_API, {
+        const { data } = await axios.get("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
 
         setProfile(data);
       } catch (err) {
@@ -40,21 +35,16 @@ export default function Dashboard() {
 
   const saveSkills = async (type, skills) => {
     const token = localStorage.getItem("token");
-
-    const res = await fetch(SKILL_API, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ [type]: skills }),
-    });
-
-    if (res.ok) {
+    try {
+      await axios.put("/api/user/skills", { [type]: skills }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProfile((prev) => ({
         ...prev,
         [type]: skills,
       }));
+    } catch (err) {
+      console.error("Failed to save skills:", err);
     }
   };
 
@@ -228,9 +218,6 @@ function StatCard({ title, value, delay }) {
   );
 }
 
-const REQUEST_API = "http://localhost:5000/api/requests/my-requests";
-const UPDATE_REQUEST_API = "http://localhost:5000/api/requests";
-
 function SwapRequestsSection() {
   const [requests, setRequests] = useState({ incoming: [], outgoing: [] });
   const [loading, setLoading] = useState(true);
@@ -242,11 +229,10 @@ function SwapRequestsSection() {
   const fetchRequests = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(REQUEST_API, {
+      const { data } = await axios.get("/api/requests/my-requests", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (res.ok) setRequests(data);
+      setRequests(data);
     } catch (err) {
       console.error("Failed to load requests", err);
     } finally {
@@ -257,18 +243,10 @@ function SwapRequestsSection() {
   const handleAction = async (id, status) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${UPDATE_REQUEST_API}/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status }),
+      await axios.put(`/api/requests/${id}`, { status }, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (res.ok) {
-        fetchRequests(); // Reload list
-      }
+      fetchRequests(); // Reload list
     } catch (err) {
       console.error("Action failed", err);
     }
