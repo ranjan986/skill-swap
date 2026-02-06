@@ -32,18 +32,18 @@ app.use(
   })
 );
 
-{/* Serve frontend */ }
+// Serve frontend
 app.use(express.static(path.join(__dirname, "../skill-swap/build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../skill-swap/build/index.html"));
-});
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/requests", requestRoutes);
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../skill-swap/build/index.html"));
+});
 
 
 const PORT = process.env.PORT || 5000;
