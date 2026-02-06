@@ -9,12 +9,16 @@
         "install-all": "npm run install-backend && npm run install-frontend",
         "build-frontend": "npm run build --prefix skill-swap",
         "build": "npm run install-all && npm run build-frontend",
-        "start": "node backend/server.js"
+        "start": "node backend/server.js",
+        "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix skill-swap\""
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "engines": {
         "node": ">=16.0.0"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1"
     }
 }
