@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import { FcGoogle } from "react-icons/fc";
+import axios from "../api/axios";
 
 const API_URL = "http://localhost:5000/api/auth/login";
 
