@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://skill-swap.vercel.app/" target="_blank" style="text-decoration:none; margin:6px;">
+  <a href="https://skill-swap-app.onrender.com/" target="_blank" style="text-decoration:none; margin:6px;">
     🌐 <b>Live Demo</b>
   </a>
   |
